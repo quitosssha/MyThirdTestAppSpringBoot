@@ -15,6 +15,10 @@ import ru.arkhipov.MyThirdTestAppSpringBoot.model.*;
 import ru.arkhipov.MyThirdTestAppSpringBoot.service.ValidationService;
 import ru.arkhipov.MyThirdTestAppSpringBoot.util.DateTimeUtil;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 @Slf4j
@@ -34,13 +38,17 @@ public class MyController {
                                              BindingResult bindingResult){
 
         log.info("Request: {}", request.toString());
+        var parsedTime = Instant.from(DateTimeUtil.getCustomFormat().parse(request.getSystemTime()));
+        var now = Instant.now().atZone(ZoneOffset.UTC);
+        var duration = Duration.between(parsedTime, now);
+        log.info("ping: {} ms", duration.toMillis());
 
         var uid = request.getUid();
 
         var response = Response.builder()
                 .uid(uid)
                 .operationUid(request.getOperationUid())
-                .systemTime(DateTimeUtil.getCustomFormat().format(new Date()))
+                .systemTime(DateTimeUtil.getCustomFormat().format(Instant.now()))
                 .code(Codes.SUCCESS)
                 .errorCode(ErrorCodes.EMPTY)
                 .errorMessage(ErrorMessages.EMPTY)
